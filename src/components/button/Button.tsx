@@ -7,13 +7,15 @@ type ButtonProps = {
   children: any;
   disabled?: boolean | undefined;
   onClick?: (e: any) => void;
+  onSubmit?: () => void;
 };
 
 export const Button: FC<ButtonProps> = (props) => {
-  const { disabled, className, type, id, children, onClick } = props;
+  const { disabled, className, type, id, children, onClick, onSubmit } = props;
 
   return (
     <button
+      onSubmit={onSubmit}
       disabled={disabled}
       onClick={onClick}
       className={className}

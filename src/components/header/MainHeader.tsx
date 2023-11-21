@@ -1,9 +1,32 @@
-import Link from "next/link";
+"use client";
 
-import { Button } from "@/components/button";
-import { FC } from "react";
+import Link from "next/link";
+import { FC, FormEventHandler } from "react";
+import { useSession, signOut, signIn } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 export const MainHeader: FC = () => {
+  const session = useSession();
+  const router = useRouter();
+
+  const handleSubmit: FormEventHandler<HTMLFormElement> = async (event) => {
+    event.preventDefault();
+
+    const formData = new FormData(event?.currentTarget);
+
+    const res = await signIn("email", {
+      email: formData.get("email"),
+      password: formData.get("password"),
+      redirect: true,
+    });
+
+    if (res && !res.error) {
+      router.push("/profile");
+    } else {
+      console.log(res);
+    }
+  };
+
   return (
     <header className="flex justify-between bg-slate-900 py-4 px-24">
       <Link
@@ -12,16 +35,44 @@ export const MainHeader: FC = () => {
       >
         Todo App
       </Link>
-      <div>
-        <Button className="text-white text-1xl font-bold bg-emerald-700 p-1 rounded-md mr-5">
-          <Link href="/todos">Try it!</Link>
-        </Button>
-        <Button className="text-white text-1xl font-bold mr-5">
-          <Link href="/sign-up">Sign up</Link>
-        </Button>
-        <Button className="text-white text-1xl font-bold">
-          <Link href="/sign-in">Sign in</Link>
-        </Button>
+      <div className="flex pt-[8px]">
+        {session?.data ? (
+          <div>
+            <Link
+              className="text-white text-1xl font-bold bg-emerald-700 p-1 rounded-md mr-5"
+              href="/todos"
+            >
+              Todos
+            </Link>
+          </div>
+        ) : undefined}
+
+        {session?.data && (
+          <Link className="text-white text-1xl font-bold mr-5" href="/profile">
+            Profile
+          </Link>
+        )}
+
+        {session?.data ? (
+          <Link
+            onClick={() => signOut({ callbackUrl: "/" })}
+            className="text-white text-1xl font-bold mr-5"
+            href="/"
+          >
+            Sign out
+          </Link>
+        ) : (
+          <div className="flex">
+            <div>
+              <Link
+                className="text-white text-1xl font-bold mr-5"
+                href="/sign-in"
+              >
+                Sign in
+              </Link>
+            </div>
+          </div>
+        )}
       </div>
     </header>
   );
