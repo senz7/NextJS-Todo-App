@@ -8,7 +8,7 @@ export const MainPageContent = () => {
       <h1 className="mt-2">Let's work together!</h1>
       <h2 className="mt-2">write your todos now!</h2>
       <Button className=" bg-emerald-700 p-2 mt-2 rounded-md">
-        <Link href="/todos">Try it!</Link>
+        <Link href="/sign-in">Try it!</Link>
       </Button>
     </div>
   );

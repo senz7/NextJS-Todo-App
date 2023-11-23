@@ -1,6 +1,6 @@
 "use client";
 
-import { FC, FormEventHandler } from "react";
+import { FC, FormEventHandler, useState } from "react";
 import { redirect, useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
 
@@ -10,23 +10,40 @@ import { GoogleButton } from "../google-button";
 
 export const SignInForm: FC = () => {
   const router = useRouter();
+  const [data, setData] = useState({
+    email: "",
+    password: "",
+  });
 
   const handleSubmit: FormEventHandler<HTMLFormElement> = async (event) => {
     event.preventDefault();
 
     const formData = new FormData(event?.currentTarget);
 
-    const res = await signIn("credentials", {
+    const response = await signIn("credentials", {
       email: formData.get("email"),
       password: formData.get("password"),
       redirect: false,
     });
 
-    if (res && !res.error) {
+    /* const registerUser = async (e: any) => {
+      e.preventDefault();
+      const responseData = await fetch("sign-in", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ data }),
+      });
+      const userInfo = await responseData.json();
+      console.log(userInfo);
+    }; */
+
+    if (response && !response.error) {
       router.push("/profile");
       redirect("/todos");
     } else {
-      console.log(res);
+      console.log(response);
     }
   };
 
@@ -38,6 +55,10 @@ export const SignInForm: FC = () => {
           <div className="flex flex-col">
             <label className="mt-1 text-white text-1xl font-bold">Email</label>
             <TextInput
+              value={data.email}
+              onChange={(e) => {
+                setData({ ...data, email: e.target.value });
+              }}
               type="email"
               className="w-[300px] mt-3 outline-none border-slate-600 border-4 rounded-md text-white bg-slate-900"
             />
@@ -47,6 +68,10 @@ export const SignInForm: FC = () => {
               Password
             </label>
             <TextInput
+              value={data.password}
+              onChange={(e) => {
+                setData({ ...data, password: e.target.value });
+              }}
               type="password"
               className="w-[300px] mt-3 outline-none border-slate-600 border-4 rounded-md text-white bg-slate-900"
             />

@@ -1,40 +1,29 @@
 "use client";
 
 import Link from "next/link";
-import { FC, FormEventHandler } from "react";
+import { FC } from "react";
 import { useSession, signOut, signIn } from "next-auth/react";
-import { useRouter } from "next/navigation";
 
 export const MainHeader: FC = () => {
   const session = useSession();
-  const router = useRouter();
-
-  const handleSubmit: FormEventHandler<HTMLFormElement> = async (event) => {
-    event.preventDefault();
-
-    const formData = new FormData(event?.currentTarget);
-
-    const res = await signIn("email", {
-      email: formData.get("email"),
-      password: formData.get("password"),
-      redirect: true,
-    });
-
-    if (res && !res.error) {
-      router.push("/profile");
-    } else {
-      console.log(res);
-    }
-  };
 
   return (
     <header className="flex justify-between bg-slate-900 py-4 px-24">
-      <Link
-        href="/"
-        className="text-white text-center items-center text-2xl mt-1 font-bold"
-      >
-        Todo App
-      </Link>
+      {session?.data ? (
+        <Link
+          href="/posts"
+          className="text-white text-center items-center text-2xl mt-1 font-bold"
+        >
+          Todo App
+        </Link>
+      ) : (
+        <Link
+          href="/"
+          className="text-white text-center items-center text-2xl mt-1 font-bold"
+        >
+          Todo App
+        </Link>
+      )}
       <div className="flex pt-[8px]">
         {session?.data ? (
           <div>
