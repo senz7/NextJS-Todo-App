@@ -12,14 +12,14 @@ export const MainHeader: FC = () => {
       {session?.data ? (
         <Link
           href="/posts"
-          className="text-white text-center items-center text-2xl mt-1 font-bold"
+          className="text-white text-center items-center text-2xl mt-1 font-bold hover:text-emerald-600"
         >
           Todo App
         </Link>
       ) : (
         <Link
           href="/"
-          className="text-white text-center items-center text-2xl mt-1 font-bold"
+          className="text-white text-center items-center text-2xl mt-1 font-bold hover:text-emerald-600"
         >
           Todo App
         </Link>
@@ -28,7 +28,7 @@ export const MainHeader: FC = () => {
         {session?.data ? (
           <div>
             <Link
-              className="text-white text-1xl font-bold bg-emerald-700 p-1 rounded-md mr-5"
+              className="text-white text-1xl font-bold bg-emerald-700 p-1 rounded-md mr-5 hover:bg-emerald-600"
               href="/todos"
             >
               Todos
@@ -37,7 +37,10 @@ export const MainHeader: FC = () => {
         ) : undefined}
 
         {session?.data && (
-          <Link className="text-white text-1xl font-bold mr-5" href="/profile">
+          <Link
+            className="text-white text-1xl font-bold mr-5 hover:text-emerald-600"
+            href="/profile"
+          >
             Profile
           </Link>
         )}
@@ -45,7 +48,7 @@ export const MainHeader: FC = () => {
         {session?.data ? (
           <Link
             onClick={() => signOut({ callbackUrl: "/" })}
-            className="text-white text-1xl font-bold mr-5"
+            className="text-white text-1xl font-bold mr-5 hover:text-emerald-600"
             href="/"
           >
             Sign out
@@ -54,7 +57,7 @@ export const MainHeader: FC = () => {
           <div className="flex">
             <div>
               <Link
-                className="text-white text-1xl font-bold mr-5"
+                className="text-white text-1xl font-bold mr-5 hover:text-emerald-600"
                 href="/sign-up"
               >
                 Register
@@ -62,7 +65,7 @@ export const MainHeader: FC = () => {
             </div>
             <div>
               <Link
-                className="text-white text-1xl font-bold mr-5"
+                className="text-white text-1xl font-bold mr-5 hover:text-emerald-600"
                 href="/sign-in"
               >
                 Login

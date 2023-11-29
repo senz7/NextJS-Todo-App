@@ -1,88 +1,37 @@
-import { compare } from "bcrypt-ts";
-import { type NextAuthOptions } from "next-auth";
-import CredentialsProvider from "next-auth/providers/credentials";
-import GoogleProvider from "next-auth/providers/google";
+import type { AuthOptions, User } from "next-auth";
+import GoggleProvider from "next-auth/providers/google";
+import Credentials from "next-auth/providers/credentials";
+import { users } from "@/data/users";
 
-import { prisma } from "@/lib/prisma";
-
-export const authOptions: NextAuthOptions = {
-  pages: {
-    signIn: "/login",
-  },
-  session: {
-    strategy: "jwt",
-  },
+export const authOptions: AuthOptions = {
   providers: [
-    GoogleProvider({
+    GoggleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_SECRET!,
     }),
-    CredentialsProvider({
-      name: "Sign in",
+    Credentials({
       credentials: {
-        email: {
-          label: "Email",
-          type: "email",
-          placeholder: "hello@example.com",
-        },
-        password: { label: "Password", type: "password" },
+        email: { label: "email", type: "email", required: true },
+        password: { label: "password", type: "password", required: true },
       },
       async authorize(credentials) {
-        if (!credentials?.email || !credentials.password) {
-          return null;
-        }
+        if (!credentials?.email || !credentials.password) return null;
 
-        const user = await prisma.user.findUnique({
-          where: {
-            email: credentials.email,
-          },
-        });
-
-        if (!user) {
-          return null;
-        }
-
-        const isPasswordValid = await compare(
-          credentials.password,
-          user.password
+        const currentUser = users.find(
+          (user) => user.email === credentials.email
         );
 
-        if (!isPasswordValid) {
-          return null;
+        if (currentUser && currentUser.password === credentials.password) {
+          const { password, ...userWithoutPass } = currentUser;
+
+          return userWithoutPass as User;
         }
 
-        return {
-          id: user.id + "",
-          email: user.email,
-          name: user.name,
-          randomKey: "Hey cool",
-        };
+        return null;
       },
     }),
   ],
-  callbacks: {
-    session: ({ session, token }) => {
-      console.log("Session Callback", { session, token });
-      return {
-        ...session,
-        user: {
-          ...session.user,
-          id: token.id,
-          randomKey: token.randomKey,
-        },
-      };
-    },
-    jwt: ({ token, user }) => {
-      console.log("JWT Callback", { token, user });
-      if (user) {
-        const u = user as unknown as any;
-        return {
-          ...token,
-          id: u.id,
-          randomKey: u.randomKey,
-        };
-      }
-      return token;
-    },
+  pages: {
+    signIn: "/sign-in",
   },
 };

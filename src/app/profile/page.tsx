@@ -1,12 +1,12 @@
 import { getServerSession } from "next-auth";
 
-import { authConfig } from "@/configs/authConfig";
+import { authOptions } from "@/configs/authConfig";
 
 export default async function Profile() {
-  const session = await getServerSession(authConfig);
+  const session = await getServerSession(authOptions);
 
   return (
-    <main className="bg-slate-800 px-24 h-screen">
+    <main className="bg-slate-800 px-20 h-screen">
       <h1 className="text-white text-left items-center text-2xl pt-3 font-bold">
         Profile of {session?.user?.name}
       </h1>

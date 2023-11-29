@@ -1,39 +1,31 @@
 "use client";
 
 import { signIn } from "next-auth/react";
-import { useState } from "react";
+import { FormEventHandler } from "react";
 
-import { Alert } from "../alert";
 import { Button } from "../button";
 import { GoogleButton } from "../google-button";
 import { TextInput } from "../input";
+import { useRouter } from "next/navigation";
 
 export const SignInForm = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit: FormEventHandler<HTMLFormElement> = async (event) => {
+    event.preventDefault();
 
-    try {
-      const response = await fetch("/api/register", {
-        method: "POST",
-        body: JSON.stringify({
-          email,
-          password,
-        }),
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-      if (response.ok) {
-        signIn();
-      } else {
-        setError((await response.json()).error);
-      }
-    } catch (error: any) {
-      setError(error?.message);
+    const formData = new FormData(event.currentTarget);
+
+    const res = await signIn("credentials", {
+      email: formData.get("email"),
+      password: formData.get("password"),
+      redirect: false,
+    });
+
+    if (res && !res.error) {
+      router.push("/profile");
+    } else {
+      console.log(res);
     }
   };
 
@@ -45,8 +37,6 @@ export const SignInForm = () => {
           <div className="flex flex-col">
             <label className="mt-1 text-white text-1xl font-bold">Email</label>
             <TextInput
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
               type="email"
               className="w-[300px] mt-3 outline-none border-slate-600 border-4 rounded-md text-white bg-slate-900"
             />
@@ -56,21 +46,17 @@ export const SignInForm = () => {
               Password
             </label>
             <TextInput
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
               type="password"
               className="w-[300px] mt-3 outline-none border-slate-600 border-4 rounded-md text-white bg-slate-900"
             />
           </div>
 
-          {error && <Alert>{error}</Alert>}
-
-          <Button className="w-[300px] mt-8 text-white text-1xl font-bold bg-emerald-700 p-1 rounded-md">
+          <Button className="w-[300px] mt-8 text-white text-1xl font-bold bg-emerald-700 p-1 rounded-md hover:bg-emerald-600">
             Submit!
           </Button>
           <p className="text-center pt-2 text-white text-1xl font-bold">or</p>
 
-          <GoogleButton className="w-[300px] mt-2 text-white text-1xl font-bold bg-emerald-700 p-1 rounded-md" />
+          <GoogleButton className="w-[300px] mt-2 text-white text-1xl font-bold bg-emerald-700 p-1 rounded-md hover:bg-emerald-600" />
         </div>
       </div>
     </form>

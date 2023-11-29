@@ -15,6 +15,11 @@ export const TodosPageContent: FC = () => {
   const [todos, setTodos] = useLocalStorage("todos", []);
 
   const [inputValue, setInputValue] = useState("");
+  const [important, setImportant] = useState(false);
+
+  const importantClick = () => {
+    setImportant(!important);
+  };
 
   const handleToggle = (id: number) => {
     setTodos(
@@ -53,12 +58,12 @@ export const TodosPageContent: FC = () => {
       <label className="text-white text-3xl font-bold">Write your Todo!</label>
       <div className="items-center">
         <TextInput
-          className="ml-20 mt-6 w-[500px] outline-none border-slate-600 border-4 rounded-md text-white bg-slate-900"
+          className="ml-20 mt-6 w-[500px] outline-none border-slate-600 border-4 rounded-md text-white bg-slate-900 focus:border-slate-500 focus:bg-slate-800"
           value={inputValue || ""}
           onChange={handleChange}
         />
         <Button
-          className="ml-3 text-white bg-emerald-700 p-1 mt-2 rounded-md"
+          className="ml-3 text-white bg-emerald-700 font-bold p-1 mt-2 rounded-md hover:bg-emerald-600"
           onClick={handleClick}
         >
           Add Todo!
@@ -69,16 +74,21 @@ export const TodosPageContent: FC = () => {
           <div key={todo.id} className="flex-row flex mt-5">
             <div>
               <li
-                className="text-white text-center mt-3"
+                className={
+                  important
+                    ? "text-emerald-400 text-center mt-3"
+                    : "text-white text-center mt-3"
+                }
                 key={todo.id}
                 onClick={() => handleToggle(todo.id)}
+                onMouseDown={importantClick}
               >
                 {todo.text}
               </li>
             </div>
             <div>
               <Button
-                className="ml-3 text-white bg-red-600 p-1 mt-2 rounded-md"
+                className="ml-3 text-white bg-red-600 p-1 mt-2 rounded-md hover:bg-red-700"
                 onClick={() => removeTodo(todo.id)}
               >
                 Delete
