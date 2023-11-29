@@ -1,10 +1,14 @@
-import { users } from "@/data/users";
-import { AuthOptions, User } from "next-auth";
-
+import { compare } from "bcrypt-ts";
+import { type NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
 
-export const authConfig: AuthOptions = {
+import { prisma } from "@/lib/prisma";
+
+export const authOptions: NextAuthOptions = {
+  pages: {
+    signIn: "/login",
+  },
   session: {
     strategy: "jwt",
   },
@@ -14,41 +18,71 @@ export const authConfig: AuthOptions = {
       clientSecret: process.env.GOOGLE_SECRET!,
     }),
     CredentialsProvider({
-      type: "credentials",
+      name: "Sign in",
       credentials: {
-        email: { label: "email", type: "email", required: true },
-        password: { label: "password", type: "password", required: true },
+        email: {
+          label: "Email",
+          type: "email",
+          placeholder: "hello@example.com",
+        },
+        password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
         if (!credentials?.email || !credentials.password) {
           return null;
         }
 
-        const currentUser = users.find(
-          (user) => user.email === credentials.email
-        );
+        const user = await prisma.user.findUnique({
+          where: {
+            email: credentials.email,
+          },
+        });
 
-        if (currentUser && currentUser.password === credentials.password) {
-          const { password, ...userWithoutPass } = currentUser;
-
-          return userWithoutPass as User;
+        if (!user) {
+          return null;
         }
 
-        return null;
+        const isPasswordValid = await compare(
+          credentials.password,
+          user.password
+        );
+
+        if (!isPasswordValid) {
+          return null;
+        }
+
+        return {
+          id: user.id + "",
+          email: user.email,
+          name: user.name,
+          randomKey: "Hey cool",
+        };
       },
     }),
   ],
-  pages: {
-    signIn: "/sign-in",
-  },
   callbacks: {
-    jwt(params) {
-      if (params.user?.id) {
-        params.token.id = params.user.id;
+    session: ({ session, token }) => {
+      console.log("Session Callback", { session, token });
+      return {
+        ...session,
+        user: {
+          ...session.user,
+          id: token.id,
+          randomKey: token.randomKey,
+        },
+      };
+    },
+    jwt: ({ token, user }) => {
+      console.log("JWT Callback", { token, user });
+      if (user) {
+        const u = user as unknown as any;
+        return {
+          ...token,
+          id: u.id,
+          randomKey: u.randomKey,
+        };
       }
-      return params.token;
+      return token;
     },
   },
-  secret: process.env.NEXTAUTH_URL,
-  debug: process.env.NODE_ENV === "development",
 };

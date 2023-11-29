@@ -1,4 +1,4 @@
-import { SignInForm } from "../sign-up-form";
+import { SignInForm } from "../sign-in-form";
 
 export const SignInPageContent = () => {
   return (

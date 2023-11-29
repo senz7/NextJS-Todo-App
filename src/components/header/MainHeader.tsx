@@ -55,9 +55,17 @@ export const MainHeader: FC = () => {
             <div>
               <Link
                 className="text-white text-1xl font-bold mr-5"
+                href="/sign-up"
+              >
+                Register
+              </Link>
+            </div>
+            <div>
+              <Link
+                className="text-white text-1xl font-bold mr-5"
                 href="/sign-in"
               >
-                Sign in
+                Login
               </Link>
             </div>
           </div>
